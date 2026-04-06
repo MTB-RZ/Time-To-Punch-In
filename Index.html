@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Tracker</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Employee Time Tracker</h2>
+
+<select id="name" onchange="checkStatus()">
+  <option value="Jaweria Tariq">Ali</option>
+  <option value="Muteeb Raza">Ahmed</option>
+</select>
+
+<br><br>
+
+<button onclick="sendData('start')">Start Time</button>
+<button onclick="sendData('end')">End Time</button>
+
+<p id="status">Checking status...</p>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwHZyGMbTPgGOL09ooDA3Fv34_9VrEWhOHqRX9fqtxDopRSCd6jZe2J2Mwbvbpq3Shn/exec";
+
+function sendData(action) {
+  const name = document.getElementById("name").value;
+
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify({ name: name, action: action })
+  })
+  .then(res => res.text())
+  .then(response => {
+      if (response === "ALREADY_STARTED") {
+        setStatus(name + " is already clocked IN");
+      } 
+      else if (response === "NOT_STARTED") {
+        setStatus(name + " has not started yet");
+      } 
+      else if (response === "STARTED") {
+        setStatus(name + " clocked IN");
+      } 
+      else if (response === "ENDED") {
+        setStatus(name + " clocked OUT");
+      } 
+      else {
+        setStatus("Error occurred");
+      }
+  })
+  .catch(() => setStatus("Connection error"));
+}
+
+function setStatus(msg) {
+  document.getElementById("status").innerText = msg;
+}
+
+function checkStatus() {
+  setStatus("Ready");
+}
+</script>
+
+</body>
+</html>
